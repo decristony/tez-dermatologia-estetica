@@ -74,4 +74,21 @@
   }
   spots.forEach(s => s.addEventListener('click', () => pick(+s.dataset.z)));
   spots[0].classList.add('act');
+
+  // TRANSIÇÕES v2: textos em cascata, cartões em sequência, fotos que se abrem e um fio que marca a passagem entre seções
+  if (!reduce && 'IntersectionObserver' in window) {
+    document.querySelectorAll('.split-copy.rv, .treat-head.rv, .map-panel.rv, .map-media.rv, .window-copy.rv, .proto-head.rv, .team-head.rv, .contact-info.rv, .form.rv').forEach(el => el.classList.add('rv-t'));
+    [['.treat-grid', '.tcard.rv'], ['.proto-steps', 'li.rv'], ['.team-row', '.person.rv']].forEach(([pai, filho]) => {
+      document.querySelectorAll(pai).forEach(p => p.querySelectorAll(filho).forEach((el, i) => { el.classList.add('rv-c'); el.style.setProperty('--d', (Math.min(i, 5) * 0.1).toFixed(2) + 's'); }));
+    });
+    const extras = [];
+    document.querySelectorAll('.split-media').forEach(el => { el.classList.add('rv-i'); extras.push(el); });
+    document.querySelectorAll('.split:not(.dark), .treat, .map, .team, .contact').forEach(s => {
+      if (s.closest('.proto')) return;
+      s.classList.add('sec-host'); const f = document.createElement('i'); f.className = 'sec-fio'; f.setAttribute('aria-hidden', 'true'); s.prepend(f); extras.push(s);
+    });
+    const io2 = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io2.unobserve(e.target); } }), { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    extras.forEach(el => io2.observe(el));
+    requestAnimationFrame(() => document.querySelectorAll('.rv, .rv-i, .sec-host').forEach(el => { if (el.getBoundingClientRect().bottom < 0) el.classList.add('in'); }));
+  }
 })();
